@@ -1,0 +1,146 @@
+---
+title: "QAA_Report"
+author: "Temi Adewunmi"
+date: "2023-09-12"
+output: 
+  pdf_document:
+    extra_dependencies: ["float"]
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tinytex)
+library(knitr)
+```
+
+# Overview
+
+This assignment aims to use existing tools for quality assessment and adaptor trimming, compare the quality assessments to those from your own software, and create a summary of my findings. The files I used for this analysis and report are 11_2H_both_S9_L008_R1_001.fastq.gz, 
+11_2H_both_S9_L008_R2_001.fastq.gz and  14_3B_control_S10_L008_R1_001.fastq.gz, 
+
+14_3B_control_S10_L008_R2_001.fastq.gz. Further down the line, these will be called 11_2H_R1, 11_2H_R2 and 14_3B_R1, 14_3B_R2, respectively. 
+
+# Goals for this Assignment
+1. Look at the Quality Score Distibution across the files
+2. Adaptor Trimming and Quality Checks
+3. Alignment and strand-specificity
+
+
+## Part 1: Quality Score Distribution across all Files
+First, we used fastqc, which generates a report that provides an overview of possible quality control metrics that can be used on our data. We then used our previously created code to generate plots that look at the mean score at each base pair.
+
+### 11_2H
+
+**Figure 1** and **Figure 2** contain the quality scores across all the bases and N content across all bases for Read 1 and Read 2 of the 11_2H dataset. The 3rd figure holds the mean quality score content for Read 1 and Read 2, respectively. When comparing the fastqc-generated plots to ours, we see that the fastqc quality score plots have interquartile ranges while the ones we generated do not. Also, on the x-axis of the fastqc plot, the positions go in ranges, whereas in the self-generated plot, it does not group up the positions. Also, it took a  shorter time for fastqc to generate the reports. The times it took to run for all files across the two methods are below.
+
+
+```{r,echo=FALSE}
+H_times<-data.frame(Reads=c('Read 1','Read 2'), Fastqc=c(User_Time=c(75.33,75.28), System_Time=c(3.76,3.97),Elapsed_Time=c(1,1)), Demultiplex=c(PS8_User_Time=c(250.55,238.36),PS8_System_Time=c(2.50,2.44),PS8_Elapsed_Time=c(4, 3)))
+kable(H_times, caption='11_2H Run Times for Fastqc and Demultiplex')
+```
+
+```{r echo=FALSE, out.width="250px", fig.cap="11-2H-R1 fastqc per base mean quality score",fig.show='hold',fig.pos='H'}
+include_graphics("C:/Users/ttemi/OneDrive/Documents/Bi623/PS/QAA/11_2H_R1_fastqc.png")
+include_graphics("C:/Users/ttemi/OneDrive/Documents/Bi623/PS/QAA/11_R1_Nbase.png")
+```
+
+```{r echo=FALSE, out.width="250px", fig.cap="11-2H-R2 fastqc per base mean quality score",fig.show='hold',fig.pos='H'}
+include_graphics("C:/Users/ttemi/OneDrive/Documents/Bi623/PS/QAA/11_2H_R2_fastqc.png")
+include_graphics("C:/Users/ttemi/OneDrive/Documents/Bi623/PS/QAA/11_R2_Nbase.png")
+```
+
+When looking at the generated plots, it is safe to see that the overall quality of the reads is good. In the fastqc-generated plots, the lowest quality score value is about 32 for both reads and in the plots we generated, the lowest quality score value is the same, i.e. around 32. As we look at more sequences in all the plots, the quality score vastly improves, reaching stable around the 40-41 range, which is a very good quality score value for most reads. Also, the N base content in Figures 1 and 2B shows that there are practically 0 unknown nucleotides in both reads, which matches the quality score plots. So, the quality of our reads is high enough for it to be used for further analysis. 
+
+```{r echo=FALSE, out.width="250px", fig.cap="11-2H Mean Score per base mean quality score. Read 1 and Read 2 respectively",fig.show='hold',fig.pos='H'}
+include_graphics("C:/Users/ttemi/OneDrive/Documents/Bi623/PS/QAA/H_R1_plot.png")
+include_graphics("C:/Users/ttemi/OneDrive/Documents/Bi623/PS/QAA/H_R2_plot.png")
+```
+
+### 14_3B
+
+The plots generated for the 14_3B samples have the same differences as 11_2H above, as they were generated the same way. However, for Read 1, the fastqc plots show much lower quality score ranges on the interquartile plots than in 11_2H. The N base count plot here also shows barely any unknown nucleotides in our sequences. The run times for both plot generation processes are below.
+
+```{r,echo=FALSE}
+B_times<-data.frame(Reads=c('Read 1','Read 2'), Fastqc=c(User_Time=c(20.76,21.46), System_Time=c(1.11,1.18),Elapsed_Time=c(21.5,22.15)),Demultiplex=c(PS8_User_Time=c(58.70,58.48),PS8_System_Time=c(2.14,2.29),PS8_Elapsed_Time=c(58.92, 58.43)))
+kable(B_times, caption='14_3B Run Times for Fastqc and Demultiplex')
+```
+
+
+```{r echo=FALSE, out.width="250px", fig.cap="14-3B-R2 fastqc per base mean quality score",fig.show='hold',fig.pos='H'}
+include_graphics("C:/Users/ttemi/OneDrive/Documents/Bi623/PS/QAA/14_3B_R2_fatsqc.png")
+include_graphics("C:/Users/ttemi/OneDrive/Documents/Bi623/PS/QAA/14_R2_Nbase.png")
+```
+
+```{r echo=FALSE, out.width="250px", fig.cap="14-3B-R1 fastqc per base mean quality score",fig.show='hold',fig.pos='H'}
+include_graphics("C:/Users/ttemi/OneDrive/Documents/Bi623/PS/QAA/14_3B_R1_fastqc.png")
+include_graphics("C:/Users/ttemi/OneDrive/Documents/Bi623/PS/QAA/14_R1_Nbase.png")
+```
+
+When looking at the overall quality of our sequences, we see that the sequences in Read 2 have a lower quality than those in Read 1 in our generated plot. However, both reads still have good scores and are high-quality enough for further analysis.
+
+
+```{r echo=FALSE, out.width="250px", fig.cap=" 14-3B Mean Score per base mean quality scoreRead 1 and Read 2 respectively",fig.show='hold',fig.pos='H'}
+include_graphics("C:/Users/ttemi/OneDrive/Documents/Bi623/PS/QAA/B_R1_plot.png")
+include_graphics("C:/Users/ttemi/OneDrive/Documents/Bi623/PS/QAA/B_R2_plot.png")
+```
+
+
+## Part 2: Adaptor Trimming and Quality Checks
+
+After ensuring that the reads were good enough for further analysis, I found the adaptors that needed to be trimmed from the sequences. These adapters were found from an illumina website and the same adaptors were used for both datasets.
+
+To get the illumina adapters I looked here: https://knowledge.illumina.com/library-preparation/general/library-preparation-general-reference_material-list/000001314
+
+**Read 1**: AGATCGGAAGAGCACACGTCTGAACTCCAGTCA
+
+**Read 2**: AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
+
+In order to confirm that these were the correct adaptors, I used UNIX commands to check the sequences. The commands return lines where the adapter exists in the file, so it is confirmed that the adapters are there. It also confirmed that the Read 1 adapters were only in the R1 files, and the Read 2 adapters were only in the R2 files.
+
+`zcat /projects/bgmp/shared/2017_sequencing/demultiplexed/11_2H_both_S9_L008_R1_001.fastq.gz | grep 'AGATCGGAAGAGCACACGTCTGAACTCCAGTCA'`
+
+`zcat /projects/bgmp/shared/2017_sequencing/demultiplexed/11_2H_both_S9_L008_R2_001.fastq.gz | grep 'AGATCGGAAGAGCACACGTCTGAACTCCAGTCA'`
+
+`zcat /projects/bgmp/shared/2017_sequencing/demultiplexed/14_3B_control_S10_L008_R2_001.fastq.gz | grep 'AGATCGGAAGAGCACACGTCTGAACTCCAGTCA'`
+
+`zcat /projects/bgmp/shared/2017_sequencing/demultiplexed/14_3B_control_S10_L008_R1_001.fastq.gz | grep 'AGATCGGAAGAGCACACGTCTGAACTCCAGTCA'`
+
+After identifying the correct adaptors. `CUTADAPT` was used to remove the adapters and it resulted in this proportion reads being trimmed:
+
+```{r,echo=FALSE}
+cutadapt<-data.frame(Samples=c('11_2H','14_3B'), Read1=c('4.9%','6.0%'), Read2=c('5.7%','6.7%'))
+kable(cutadapt, caption='Proportion of Trimmed reads')
+```
+
+Following the adaptor trimming, `TRIMMOMATIC` was used to do more quality trimming. Which resulted in some of the sequences in our reads being shorter. The length of the reads after trimming can be seen in **Figure 7**. When looking at the plots of sequences across the samples, we see that the sequences in Read 2 are trimmed more extensively than those in Read 1. This is because Read 2 has a lower quality score distribution, which we can see from our figures above and with the parameters set for Trimmomatic, the package cuts low-quality base pairs in at the beginning and end, as well as any base pairs that have an average quality score below 15. So, we end up with shorter-length sequences for Read 2.
+
+```{r echo=FALSE, out.width="250px", fig.cap="Read Lengths for Both sets samples",fig.show='hold',fig.pos='H'}
+include_graphics("C:/Users/ttemi/OneDrive/Documents/Bi623/PS/QAA/11_2H_paired2.png")
+include_graphics("C:/Users/ttemi/OneDrive/Documents/Bi623/PS/QAA/14_3B_paired2.png")
+```
+
+## Part 3: Alignment and strand-specificity
+
+After ensuring our samples have been appropriately filtered and trimmed, the next step would be to perform Mapping and Alignment. This was done using the STAR aligner and scripts written in a previous assignment. The files used to create the reference genome were `Mus_musculus.GRCm39.dna_sm.primary_assembly.fa.gz`, `Mus_musculus.GRCm39.110.gtf.gz`, both downloaded from Ensembl. One of the outputs from this alignment was a SAM file. Before further analysis, we used previously written code to get the number of Mapped and Unmapped reads from our SAM file.
+
+```{r,echo=FALSE}
+map_unmap<-data.frame(Samples=c('11_2H','14_3B'), Mapped=c(33637672,8312388), Unmapped=c(1293554,180916))
+kable(map_unmap, caption='Mapped and Unmapped Reads per Sample')
+```
+
+For the next step, we used `htseq-count` on the SAM file  to count reads that map to features. We ran it with 2 options --stranded=yes and --stranded=reverse and were able to determine whether our data was strand-specific or not. 
+
+```{r,echo=FALSE}
+H_strand<-data.frame(Stranded=c('Yes','Reverse'), Mapped=c(591682,13819087), Total_Reads=c(17465613,17465613), Percent_Map=c('3.38%','79.12%'))
+kable(H_strand, caption='11_2H Htseq Results')
+
+B_strand<-data.frame(Stranded=c('Yes','Reverse'), Mapped=c(164513,3666879), Total_Reads=c(4246652,4246652), Percent_Map=c('3.87%','86.35%'))
+kable(B_strand, caption='14_3B Htseq Results')
+```
+
+Within HTSeq, the 'stranded' parameter presents a trio of choices. When employed without specification, it indicates whether a given read has aligned with any feature, regardless of whether it aligns on the same strand or its opposite counterpart. Opting for 'stranded=yes' as the parameter suggests that for paired-end reads to be tallied, the first read must align with the same strand as the feature, while the second read should align with the opposite strand. Conversely, the utilization of 'stranded=reverse' as the parameter inverts the criteria compared to 'stranded=yes.'
+
+Looking at the tables above, we see an examination of the files using 'stranded=yes' unveiled that only 3.28% (11_2H) and 3.87% (14_3B) of the reads mapped accordingly. Conversely, 'stranded=reverse' yielded a substantially higher percentage, with 79.12% (11_2H) and 86.35% (14_3B) of reads aligning in a stranded manner. These findings lead me to conclude that the RNA-seq is indeed designed to be strand-specific.
+
+
+
