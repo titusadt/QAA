@@ -1,6 +1,7 @@
-INTRO STUFF
+QAA
 Teminijesu Titus Adewunmi
-
+temi@uoregon.edu
+9/14/2023
 
 
 ################
@@ -374,6 +375,7 @@ READ COUNT
 Copied read count python script from PS8 to run with my SAM files 
 
 RESULTS: 
+./read_count.py -f1 14_3B_RNA_STARAligned.out.sam 
 Number of mapped files: 8312388
 Number of unmapped files: 180916
 
